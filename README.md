@@ -44,10 +44,7 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
     ├── results_H2_M6_joint.csv             # H2 Model M6: Joint momentum (both directions)
     ├── results_ExtA_tourist.csv            # H3 Ext-A: Tourist-core subgroup
     ├── results_ExtB_nontourist.csv         # H3 Ext-B: Non-tourist subgroup
-    ├── results_ExtC_interaction.csv        # H3 Ext-C: Full-sample interaction model
-    ├── data_H1_listing_level.csv           # H1 estimation sample (listing-level)
-    ├── data_H2_panel_survival.csv          # H2 estimation sample (quarterly panel)
-    └── extension_spatial_plots.png         # Figure: 6-panel spatial heterogeneity visualization
+    └── results_ExtC_interaction.csv        # H3 Ext-C: Full-sample interaction model
 ```
 
 ---
