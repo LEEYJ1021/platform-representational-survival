@@ -1,0 +1,7 @@
+pair,HTMT,pass_conservative,pass_liberal
+fit_z ~ var_z,0.0043,TRUE,TRUE
+fit_z ~ pmom_z,0.2431,TRUE,TRUE
+fit_z ~ nmom_z,0.0301,TRUE,TRUE
+var_z ~ pmom_z,0.3331,TRUE,TRUE
+var_z ~ nmom_z,0.011,TRUE,TRUE
+pmom_z ~ nmom_z,0.427,TRUE,TRUE

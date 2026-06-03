@@ -1,0 +1,7 @@
+Test,Stat,p,Pass,Result
+Shapiro-Wilk,NA,0,FALSE,비정규
+Jarque-Bera,NA,0,FALSE,비정규
+Breusch-Pagan,NA,0.7738,TRUE,등분산
+Durbin-Watson,1.9909,0.3897,TRUE,자기상관 없음
+Condition #,27.75,NA,TRUE,MCN OK
+RESET,NA,0.7349,TRUE,함수형식 OK
