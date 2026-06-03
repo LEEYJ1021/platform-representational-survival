@@ -74,8 +74,7 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
         ├── cohort_heatmap.png           # Cohort × Quarter mean semantic distance
         ├── tenure_effect.png            # Semantic distance & drift by tenure
         ├── residuals_hist.png           # OLS residual distribution with KDE
-        ├── influence_plot.png           # Leverage vs Cook's D influence plot
-        └── quantile_coef.png            # QR coefficient plot τ = 0.1–0.9
+        └── influence_plot.png           # Leverage vs Cook's D influence plot
 ```
 
 ---
