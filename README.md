@@ -58,8 +58,7 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
     │   ├── htmt_discriminant_validity.csv      # HTMT + Fornell-Larcker
     │   ├── mice_pool_check.csv                 # Rubin's rules pool check (m = 5)
     │   ├── ml_performance_results.csv          # OOS RMSE / R² / MAE for 6 ML models
-    │   ├── bootstrap_ci_results.csv            # Percentile + BCa bootstrap CIs
-    │   └── quantile_regression_results.csv     # QR β(SEMANTIC_DISTANCE_L) τ = 0.1–0.9
+    │   └── bootstrap_ci_results.csv            # Percentile + BCa bootstrap CIs
     │
     └── figures/                         # All saved PNG plots
         ├── pca_scree_768d.png           # PCA scree with cumulative variance (768-d)
