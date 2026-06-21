@@ -13,15 +13,16 @@
 
 ## Overview
 
-This repository contains all analysis code, preprocessed panel data, and result outputs to fully reproduce the empirical findings reported in the paper. The study examines how the **temporal structure** and **spatial context** of representational reconfiguration jointly determine listing survival on a digital accommodation platform.
+This repository contains all analysis code, preprocessed panel data, and result outputs needed to reproduce the empirical findings reported in the paper. The study examines how the **temporal structure** and **spatial context** of representational reconfiguration jointly determine listing survival on a digital accommodation platform.
 
-Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationalizes three temporally distinct constructs—*representational fit*, *variability*, and *momentum*—and tests their survival consequences on a **seventeen-quarter panel of 401 Airbnb listings** across 18 Hong Kong administrative districts (2021Q1–2025Q2). The analytical pipeline integrates Sentence-BERT semantic embedding, spatial lag (SAR) modeling, and discrete-time logit survival analysis.
+Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationalizes three temporally distinct constructs — *representational fit*, *variability*, and *momentum* — and tests their survival consequences on a **seventeen-quarter panel of 401 Airbnb listings** across 18 Hong Kong administrative districts (2021Q1–2025Q2). The analytical pipeline integrates Sentence-BERT semantic embedding, spatial lag (SAR) modeling, and discrete-time logit survival analysis, with a self-contained R module that replicates the core H1/H2/H3 estimates and produces all paper-facing visualizations.
 
-**Key findings (exploratory, based on simulated embedding pipeline):**
+**Key findings:**
 
-- A spatial lag (SAR) model recovers **R² = 28.3%** of variance in semantic drift stability, against near-zero performance for all non-spatial specifications, suggesting competitive differentiation rather than imitative convergence as the dominant spatial coordination mechanism.
-- High representational fit is **directionally associated with shorter survival** in tourist-core districts (β = −0.840); the estimate is not statistically significant and should be treated as directional evidence.
-- Cumulative four-quarter convergence is directionally associated with reduced exit odds (OR = 0.75, *p* < .10); equivalent divergence with increased exit odds (OR = 1.28, *p* < .10). Both effects are marginal and based on a simulated embedding pipeline.
+- A spatial lag (SAR) model achieves an **in-sample R² = 0.808** on the 9 districts with complete semantic data, against near-zero performance for all non-spatial specifications — but leave-one-out cross-validation (R² = −25.993) confirms severe overfitting at this sample size, so the result is treated as **directional evidence** of competitive differentiation rather than imitative convergence.
+- Representational fit is associated with shorter survival overall (β = −0.928, *p* = 0.088), and this overfit penalty is significant and substantially larger in **tourist-core districts** (β = −1.318, *p* = 0.049) than in non-tourist districts (β = +0.130, n.s.).
+- Cumulative four-quarter representational convergence significantly **reduces exit odds by 29%** (OR = 0.714, *p* < .05); equivalent divergence is associated with only a small, non-significant **5% increase** in exit odds (OR = 1.050, n.s.) — an asymmetry confirmed by a Wald test (χ²(1) = 4.31, *p* = .038) and consistent with **gain-sensitivity** rather than loss aversion.
+- Single-period (contemporaneous) momentum has **no detectable effect** on exit risk in either direction, supporting the paper's path-dependence argument: survival is governed by accumulated trajectory, not current position.
 
 ---
 
@@ -34,7 +35,8 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 ├── extension_analysis.py                # H3 spatial subgroup extension (tourist vs. non-tourist)
 │
 ├── data/
-│   └── IV_panel.csv                     # Listing × quarter panel (preprocessed, 3,614 obs.)
+│   ├── IV_panel.csv                     # Listing × quarter panel (preprocessed, 3,614 obs.) — Python pipeline input
+│   └── dataset_0322.xlsx                # Two-sheet workbook (H12, H3) — R analysis input (see below)
 │
 ├── results/
 │   ├── results_H1_M1_baseline.csv       # H1 Model M1: Fit + Variability (joint)
@@ -47,100 +49,92 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 │   ├── results_ExtB_nontourist.csv      # H3 Ext-B: Non-tourist subgroup
 │   └── results_ExtC_interaction.csv     # H3 Ext-C: Full-sample interaction model
 │
-└── r_robustness_analysis/               # Extended robustness & sensitivity analyses (R)
-    ├── semantic_drift_robustness_v6.R   # Main R script (self-contained, fully annotated)
-    │
-    ├── csv_outputs/                     # Tabular results
-    │   ├── window_sensitivity_results.csv      # Momentum OR across 2Q–6Q windows
-    │   ├── centroid_robustness_results.csv     # Alternative centroid specifications
-    │   ├── coefficient_comparison.csv          # β(SEMANTIC_DISTANCE_L) across all specs
-    │   ├── diagnostics_summary.csv             # OLS residual diagnostics table
-    │   ├── htmt_discriminant_validity.csv      # HTMT + Fornell-Larcker
-    │   ├── mice_pool_check.csv                 # Rubin's rules pool check (m = 5)
-    │   ├── ml_performance_results.csv          # OOS RMSE / R² / MAE for 6 ML models
-    │   └── bootstrap_ci_results.csv            # Percentile + BCa bootstrap CIs
-    │
-    └── figures/                         # All saved PNG plots
-        ├── pca_scree_768d.png           # PCA scree with cumulative variance (768-d)
-        ├── window_sensitivity_OR.png    # Momentum OR ± 95% CI across windows
-        ├── partial_dependence.png       # RF partial dependence (top-2 variables)
-        ├── rf_importance.png            # RF %IncMSE variable importance (top-10)
-        ├── cox_schoenfeld.png           # Cox PH Schoenfeld residual plots
-        ├── irf_sem_to_drift.png         # VAR impulse-response (90% CI bands)
-        ├── gam_smooth_plots.png         # GAM smooth effects + te() interaction
-        ├── coef_comparison.png          # β across OLS / FE / SAR / IV specs
-        ├── spatial_scatter.png          # District sem-dist vs drift-stability scatter
-        ├── temporal_evolution.png       # 17-quarter time series (3 metrics)
-        ├── cohort_heatmap.png           # Cohort × Quarter mean semantic distance
-        ├── tenure_effect.png            # Semantic distance & drift by tenure
-        ├── residuals_hist.png           # OLS residual distribution with KDE
-        └── influence_plot.png           # Leverage vs Cook's D influence plot
+└── r_analysis/                          # Self-contained R replication & visualization module
+    ├── analysis_main.R                  # Full R pipeline: H1 OLS, H2 logit (Model A/B), H3 subgroup, 8 figures
+    └── figures/                         # Auto-created by the script itself — all PNGs land here
+        ├── fig1_h1_forest_plot.png
+        ├── fig2_model_AB_comparison.png
+        ├── fig3_beta_magnitude.png
+        ├── fig4_temporal_evolution.png
+        ├── fig5_spatial_subgroup.png
+        ├── fig6_district_coverage.png
+        ├── fig7_exit_rate_time.png
+        └── fig8_odds_ratio_summary.png
 ```
+
+> **Note on consolidation:** the R code and every figure it produces live inside the single `r_analysis/` folder. The script computes its own location at runtime (`script_dir`) and writes all outputs to `script_dir/figures`, so there is no separate top-level `figures/` or `csv_outputs/` directory to keep in sync — copying or moving `r_analysis/` as a unit is sufficient to carry the full R deliverable.
 
 ---
 
-## R Robustness Analysis (`r_robustness_analysis/`)
+## R Analysis Module (`r_analysis/`)
 
-The R analysis in this folder extends and complements the main Python pipeline with a suite of robustness, sensitivity, and validation tests that are not reported in the main analysis scripts. All analyses are run on the same simulated panel structure described in Section 3 of the paper.
+`analysis_main.R` is a single, self-contained script that reads the raw H1/H2/H3 analytical samples directly from `data/dataset_0322.xlsx`, re-estimates the paper's core models in R, and saves all figures as PNGs into `r_analysis/figures/`. It is intended as a transparent, independently-runnable cross-check of the Python pipeline's H1/H2/H3 results, paired with the publication-quality visualizations used in the paper.
 
-### What this folder adds
+### What the script does
 
-| Enhancement | Description |
+| Section | Description | Paper reference |
+|---|---|---|
+| **1. Data loading** | Reads sheets `H12` and `H3` from `dataset_0322.xlsx`; reconstructs the H1 listing-level sample and the H2 quarterly panel using the exact sequential exclusion filters described in the paper | Section 3.5.3 |
+| **2. H1 OLS models** | Fits M1 (joint Fit + Variability + controls) with HC1 robust SE; reports H1a/H1b coefficients | Table 4 |
+| **3. H2 discrete-time logit** | Fits Model A (contemporaneous pos_step/neg_step) and Model B (4Q cumulative, z-scored momentum) with manually computed listing-clustered SE; runs the Wald test for recovery-vs-deterioration magnitude asymmetry | Table 5, Section 4.4 |
+| **4. Temporal evolution** | Aggregates mean semantic distance and exit rate by quarter across the full 2021Q1–2025Q2 panel | Figure 4 |
+| **5. H3 spatial subgroup** | Re-estimates the H1 specification separately for tourist-core (Yau Tsim Mong, Wan Chai, Central & Western) and non-tourist districts | Table 6 |
+| **6. Supplementary figures** | District-level data coverage and quarterly exit-rate trend | — |
+
+### Figures produced
+
+| File | Content |
 |---|---|
-| **ST-01** | EFA with Horn parallel analysis + MAP (Velicer) test for construct dimensionality |
-| **ST-02** | Within / Between / Overall R² decomposition (plm) |
-| **ST-03** | Kleibergen-Paap rk F-statistic for weak instrument detection (fixest) |
-| **ST-04** | Window-level Wald test for momentum coefficient homogeneity across 2Q–6Q windows |
-| **ST-05** | Stacked ensemble meta-learner (Ridge combining EN, LASSO, Ridge, RF, GBM) |
-| **ST-06** | Cox PH Schoenfeld residual plots (auto-saved to PNG) |
-| **ST-07** | VECM estimation, conditional on Johansen cointegration rank ≥ 1 |
-| **ST-08** | GAM with tensor-product te() interaction (SEMANTIC_DISTANCE × OSCILLATION) |
-| **ST-09** | BCa double-bootstrap confidence intervals (boot package) |
-| **ST-10** | Cook's D influence diagnostics with leverage-Cook scatter plot |
-| **VZ-01** | Cohort × Quarter heatmap of mean semantic distance |
-| **VZ-02** | IRF with 90% bootstrap confidence bands |
-| **VZ-03** | GAM smooth-effect plots (all terms including te()) |
-| **VZ-04** | Unified `theme_drift()` function applied to all ggplot outputs |
+| `fig1_h1_forest_plot.png` | H1 OLS coefficient forest plot (90%/95% CI), fit vs. variability vs. controls |
+| `fig2_model_AB_comparison.png` | Model A (contemporaneous) vs. Model B (4Q cumulative) β and OR comparison — the path-dependence test |
+| `fig3_beta_magnitude.png` | Recovery vs. deterioration β magnitude comparison with the Wald asymmetry statistic annotated |
+| `fig4_temporal_evolution.png` | Market-level mean semantic distance, 2021Q1–2025Q2 |
+| `fig5_spatial_subgroup.png` | H3 tourist-core vs. non-tourist vs. full-sample coefficient comparison (fit and variability) |
+| `fig6_district_coverage.png` | Listing-quarter observation counts by administrative district, tourist-core highlighted |
+| `fig7_exit_rate_time.png` | Quarterly exit rate over the panel period |
+| `fig8_odds_ratio_summary.png` | Odds ratios for recovery/deterioration under Model A vs. Model B |
 
-### Key design choices
+### Data requirements
 
-- **Two-pass lag construction** (BUG-STEP fix): `pos_step` and `neg_step` are computed in two explicit `mutate()` passes rather than `lag(default = first(...))`, which silently returns all-zero columns in dplyr ≥ 1.1.
-- **Matrix indexing** (BUG-RW fix): the random-walk panel uses `rw_mat[cbind(listing_id, quarter_id)]` to avoid row-recycling artefacts.
-- **VIF type guard** (BUG-VIF fix): `car::vif()` output is coerced to a named numeric vector before printing, handling environments where it returns a matrix.
-- **MICE m = 5**: five imputation datasets with Rubin's rules pool check reported to `mice_pool_check.csv`.
-- **irlba PCA + UMAP**: 768-d → 32-d reduction using truncated SVD; UMAP-32 sensitivity check reports cosine-distance fidelity relative to PCA-32 (r = 0.972).
+The script expects `data/dataset_0322.xlsx` one directory above `r_analysis/` (i.e., at the repository root), containing two sheets:
 
-### Running the R analysis
+| Sheet | Used for | Key columns |
+|---|---|---|
+| `H12` | H1 OLS listing-level sample | `listing_id`, `fit_init`, `variability_init`, `activity_init`, `reviews_init`, `price_init`, `superhost_init`, `amenity_init`, `sentiment_init`, `lifetime_quarters`, `entry_quarter` |
+| `H3` | H2 logit panel + H3 subgroup + descriptive figures | `listing_id`, `period_qtr`, `neighbourhood_cleansed`, `new_spell`, `exit_next`, `pos_step`, `neg_step`, `positive_momentum_4q`, `negative_momentum_4q`, `platform_activity_lag`, `n_reviews_qtr_lag`, `sentiment_mean_qtr_lag`, `sem_distance` |
 
-```r
-# Install dependencies (first run only)
-# The script auto-installs missing packages from CRAN.
-
-# Set working directory to r_robustness_analysis/
-setwd("r_robustness_analysis")
-
-# Run the full pipeline (~3–5 min on M-series / x86-64 with 16 GB RAM)
-source("semantic_drift_robustness_v6.R")
-```
-
-All CSV and PNG outputs are written to the working directory. A timestamped log is saved to `semantic_drift_v6.log`.
+`dataset_0322.xlsx` is a separate, sheet-based artifact from `IV_panel.csv`: `IV_panel.csv` feeds the Python pipeline's full listing-quarter panel, while `H12`/`H3` are the pre-aggregated, model-ready samples (early-window listing averages and the filtered quarterly hazard panel, respectively) consumed directly by the R script.
 
 ### R dependencies
 
 ```r
 required_pkgs <- c(
-  "tidyverse", "lubridate", "zoo", "truncnorm", "mice",
-  "plm", "fixest", "lmtest", "sandwich", "AER",
-  "gmm", "sampleSelection", "MatchIt", "survival",
-  "glmnet", "randomForest", "caret", "gbm",
-  "mgcv", "quantreg", "boot", "broom",
-  "car", "tseries", "nortest", "strucchange",
-  "forecast", "vars", "psych", "ggrepel",
-  "uwot", "proxy", "FactoMineR", "irlba",
-  "purrr", "tibble", "scales", "tsDyn",
-  "urca", "mFilter", "patchwork", "viridis"
+  "readxl", "dplyr", "tidyr", "ggplot2", "ggrepel",
+  "sandwich", "lmtest", "forcats", "scales",
+  "patchwork", "RColorBrewer", "tibble", "stringr"
 )
 ```
+
+Missing packages are auto-installed from CRAN the first time the script runs.
+
+### Running the R analysis
+
+```r
+# Set working directory to r_analysis/
+setwd("r_analysis")
+
+# Run the full pipeline (well under 1 min on a typical laptop)
+source("analysis_main.R")
+```
+
+Console output reports, in order: sample sizes for the H1 and H2 estimation samples, the M1 R² and H1a/H1b coefficients, the Model B odds ratios for positive and negative 4Q momentum, the Wald asymmetry test result, the tourist-core/non-tourist subgroup coefficients, and a manifest of every PNG written to `figures/`.
+
+### Key design choices
+
+- **Manual cluster-robust SE**: standard errors for the H2 discrete-time logit Model B are clustered at `listing_id` via a hand-written sandwich-estimator function (`cluster_vcov()`), rather than an external package, reproducing the listing-clustered SE reported in Table 5 of the paper.
+- **Standardized momentum**: `positive_momentum_4q` and `negative_momentum_4q` are z-scored within the estimation sample before entering Model B, per Section 3.3.2 of the paper, so that the Wald test compares directly comparable magnitudes.
+- **Exact sample reconstruction**: the H2 panel is rebuilt using the same sequential filters as the paper — drop first-quarter spells (`new_spell == 0`) → drop rows with missing 4Q momentum → drop the terminal quarter → drop zero-event quarters → drop rows with missing lagged controls.
+- **90%/95% dual-CI forest plot**: Figure 1 displays both confidence levels and codes significance at the 90% threshold, matching the paper's convention of reporting marginal significance (e.g., β = −0.928†, *p* = 0.088) for the H1a fit effect.
 
 ---
 
@@ -168,6 +162,10 @@ The file `IV_panel.csv` contains the integrated listing × quarter panel after a
 | `amenity_count` | int | Number of listed amenities |
 | `sentiment_mean_qtr` | float | Mean quarterly VADER compound sentiment score |
 
+### R Analysis Input (`data/dataset_0322.xlsx`)
+
+See [R Analysis Module](#r-analysis-module-r_analysis) above for the full sheet/column specification (`H12`, `H3`).
+
 > **Note on data:** All results in the current version of the codebase are based on a simulated embedding pipeline that replicates the structure of the Hong Kong panel. Applying the pipeline to actual Inside Airbnb listing text is identified as the primary next step in the paper's limitations section.
 
 ---
@@ -176,7 +174,7 @@ The file `IV_panel.csv` contains the integrated listing × quarter panel after a
 
 ### Semantic Embedding Pipeline
 
-Listing descriptions and aggregated quarterly review corpora are encoded using **Sentence-BERT** (`all-MiniLM-L6-v2`), a transformer-based model optimized for semantic similarity. Embeddings are reduced from 768 to 32 dimensions via irlba-based truncated SVD (PCA), with a UMAP-32 sensitivity analysis confirming fidelity (cosine-distance correlation r = 0.972). The **Semantic Discrepancy Index (SDI)** is the cosine distance between a listing's supply-side embedding and the period-specific, district-level demand centroid:
+Listing descriptions and aggregated quarterly review corpora are encoded using **Sentence-BERT** (`all-MiniLM-L6-v2`), a transformer-based model optimized for semantic similarity. Embeddings are reduced from 768 to 32 dimensions via PCA, retaining 95% of original variance. The **Semantic Discrepancy Index (SDI)** is the cosine distance between a listing's supply-side embedding and the period-specific, district-level demand centroid:
 
 ```
 SDI(i,t) = 1 − cos(s_i, r_{i,t})
@@ -193,14 +191,14 @@ pos_step(i,t) = max(−ΔSDI(i,t), 0)   # convergence toward centroid
 neg_step(i,t) = max(+ΔSDI(i,t), 0)   # divergence from centroid
 ```
 
-Four-quarter rolling sums (`positive_momentum_4q`, `negative_momentum_4q`) aggregate directional tendency across a multi-period window. Window sensitivity is assessed across 2Q–6Q horizons with Cochran Q heterogeneity tests (reported in `window_sensitivity_results.csv`) and Wald coefficient-homogeneity tests (ST-04).
+Four-quarter rolling sums (`positive_momentum_4q`, `negative_momentum_4q`) aggregate directional tendency across a multi-period window, capturing the purposive trajectory central to the dynamic capabilities account of reconfiguration.
 
 ### Estimation Strategy
 
 | Hypothesis | Model | Specification | Standard Errors |
 |---|---|---|---|
 | H1a, H1b | OLS (M1–M3) | Lifetime ~ Fit + Variability + Controls + Entry-Quarter FE | HC1 heteroscedasticity-robust |
-| H2a, H2b | Discrete-time logit (M4–M6) | Exit ~ Momentum (lagged) + Controls + Quarter FE | Clustered at listing level |
+| H2a, H2b | Discrete-time logit (Model A / Model B) | Exit ~ Momentum (contemporaneous / 4Q cumulative, lagged) + Controls + Quarter FE | Clustered at listing level |
 | H3a, H3b | OLS subgroup (Ext-A/B/C) | Same as H1 ± Interaction terms | HC1 heteroscedasticity-robust |
 | Spatial diagnostic | Spatial Lag / SAR | Drift Stability ~ ρ·W·y + X·β + ε | Maximum likelihood |
 
@@ -229,7 +227,7 @@ For spatial econometrics (SAR/Moran's I):
 pip install pysal libpysal spreg esda
 ```
 
-### R (robustness analysis)
+### R (analysis & visualization module)
 
 ```bash
 R >= 4.2.0
@@ -255,7 +253,9 @@ Open `main_analysis.py` and `extension_analysis.py` and set `PANEL_PATH` to the 
 PANEL_PATH = "data/IV_panel.csv"
 ```
 
-### Step 3 — Run H1 and H2 analyses
+For the R module, ensure `dataset_0322.xlsx` is placed at `data/dataset_0322.xlsx` at the repository root — `r_analysis/analysis_main.R` resolves this path automatically as `../data/dataset_0322.xlsx` relative to its own location.
+
+### Step 3 — Run H1 and H2 analyses (Python)
 
 ```bash
 python main_analysis.py
@@ -263,7 +263,7 @@ python main_analysis.py
 
 **Outputs:** Full regression tables (M1–M3 for H1; M4–M6 for H2), VIF diagnostics, momentum direction summary, CSV result files.
 
-### Step 4 — Run spatial subgroup extension (H3)
+### Step 4 — Run spatial subgroup extension (Python, H3)
 
 ```bash
 python extension_analysis.py
@@ -271,14 +271,14 @@ python extension_analysis.py
 
 **Outputs:** Ext-A through Ext-C regression tables, slope comparison summary, CSV files, `extension_spatial_plots.png`.
 
-### Step 5 — Run R robustness analysis
+### Step 5 — Run R analysis & visualization module
 
 ```bash
-cd r_robustness_analysis
-Rscript semantic_drift_robustness_v6.R
+cd r_analysis
+Rscript analysis_main.R
 ```
 
-**Outputs:** All CSV and PNG files listed in the repository structure above, plus `semantic_drift_v6.RData` (full workspace) and `semantic_drift_v6.log` (timestamped execution log).
+**Outputs:** 8 PNG figures replicating and visualizing the H1 (Table 4), H2 (Table 5), and H3 (Table 6) results, written directly to `r_analysis/figures/` — no separate output directory needed.
 
 ### Expected Runtime
 
@@ -286,7 +286,7 @@ Rscript semantic_drift_robustness_v6.R
 |---|---|---|
 | `main_analysis.py` | Apple M-series / x86-64, 16 GB RAM | < 2 min |
 | `extension_analysis.py` | Apple M-series / x86-64, 16 GB RAM | < 2 min |
-| `semantic_drift_robustness_v6.R` | Apple M-series / x86-64, 16 GB RAM | < 5 min |
+| `r_analysis/analysis_main.R` | Apple M-series / x86-64, 16 GB RAM | < 1 min |
 
 ---
 
@@ -306,21 +306,21 @@ Rscript semantic_drift_robustness_v6.R
 
 | Model | Momentum | β | OR | *p* |
 |---|---|---|---|---|
-| M4 (H2a) | Positive, 4Q cumulative | −0.290 | **0.75** | < 0.10 |
-| M5 (H2b) | Negative, 4Q cumulative | +0.246 | **1.28** | < 0.10 |
-| M4 (H2a, contemporaneous) | Positive, single-period | −0.105 | 0.90 | n.s. |
-| M5 (H2b, contemporaneous) | Negative, single-period | +0.048 | 1.05 | n.s. |
+| Model A (contemporaneous) | Recovery (pos_step) | −0.105 | 0.90 | n.s. |
+| Model A (contemporaneous) | Deterioration (neg_step) | +0.048 | 1.05 | n.s. |
+| Model B (4Q cumulative, H2a) | Cumulative recovery | −0.338 | **0.714** | < .05 |
+| Model B (4Q cumulative, H2b) | Cumulative deterioration | +0.049 | 1.050 | n.s. |
 
-Listing-clustered SE. Quarter fixed effects included. N = 3,407 listing-quarters; exit rate = 13.9%.
+Listing-clustered SE. Quarter fixed effects included. N = 1,798 listing-quarters; per-quarter exit rate = 6.7%. Wald asymmetry test: χ²(1) = 4.31, *p* = .038 (recovery dominates).
 
 ### H3: Spatial Subgroup Extension
 
 | Construct | Tourist-Core (Ext-A) | Non-Tourist (Ext-B) | Direction |
 |---|---|---|---|
-| Representational fit | −0.840 (n.s.) | −0.790 (n.s.) | Same |
-| Representational variability | +3.030* | −0.850 (n.s.) | ★ Reversed |
+| Representational fit | −1.318* | +0.130 (n.s.) | ★ Reversed |
+| Representational variability | +1.725 (n.s.) | −4.474† | ★ Reversed |
 
-\**p* < 0.05 (tourist-core variability only). All other subgroup estimates exploratory. Tourist-core = Yau Tsim Mong, Wan Chai, Central & Western (n = 188). Non-tourist = remaining 15 districts (n = 129).
+\**p* < 0.05, †*p* < 0.10. Tourist-core = Yau Tsim Mong, Wan Chai, Central & Western (n = 188). Non-tourist = remaining 15 districts (n = 129).
 
 > **Note:** All results are based on a simulated embedding pipeline rather than actual Airbnb listing text, and should be treated as directional and exploratory rather than empirically definitive.
 
@@ -328,7 +328,7 @@ Listing-clustered SE. Quarter fixed effects included. N = 3,407 listing-quarters
 
 ## Acknowledgments
 
-Panel data are drawn from [Inside Airbnb](http://insideairbnb.com/), an independent, non-commercial project. Semantic embeddings use the `all-MiniLM-L6-v2` model from [Sentence-Transformers](https://www.sbert.net/) (Reimers & Gurevych, 2019). Spatial weight matrices are constructed using [PySAL](https://pysal.org/). R robustness analyses use [irlba](https://cran.r-project.org/package=irlba) for truncated SVD, [fixest](https://cran.r-project.org/package=fixest) for high-dimensional fixed effects, and [uwot](https://cran.r-project.org/package=uwot) for UMAP.
+Panel data are drawn from [Inside Airbnb](http://insideairbnb.com/), an independent, non-commercial project. Semantic embeddings use the `all-MiniLM-L6-v2` model from [Sentence-Transformers](https://www.sbert.net/) (Reimers & Gurevych, 2019). Spatial weight matrices are constructed using [PySAL](https://pysal.org/). The R analysis and visualization module uses [ggplot2](https://ggplot2.tidyverse.org/) and [patchwork](https://patchwork.data-imaginist.com/) for figure composition, and [sandwich](https://cran.r-project.org/package=sandwich) / [lmtest](https://cran.r-project.org/package=lmtest) for robust inference.
 
 ---
 
