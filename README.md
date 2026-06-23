@@ -1,4 +1,4 @@
-# Conformity, Trajectory, and Space: A Dynamic Capabilities Account of Representational Survival in Platform Accommodation Markets
+# Conformity, Trajectory, and Space: A Dynamic Capabilities Account of Representational Survival in Platform Service Markets
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![R 4.2+](https://img.shields.io/badge/R-4.2%2B-276DC3.svg)](https://www.r-project.org/)
@@ -7,21 +7,21 @@
 [![Framework: Statsmodels](https://img.shields.io/badge/Framework-Statsmodels-green.svg)](https://www.statsmodels.org/)
 
 > **Replication materials for the paper:**
-> *Conformity, Trajectory, and Space: A Dynamic Capabilities Account of Representational Survival in Platform Accommodation Markets*
+> *Conformity, Trajectory, and Space: A Dynamic Capabilities Account of Representational Survival in Platform Service Markets*
 
 ---
 
 ## Overview
 
-This repository contains all analysis code, preprocessed panel data, and result outputs needed to reproduce the empirical findings reported in the paper. The study examines how the **temporal structure** and **spatial context** of representational reconfiguration jointly determine listing survival on a digital accommodation platform.
+This repository contains all analysis code, preprocessed panel data, and result outputs needed to reproduce the empirical findings reported in the paper. The study examines how the **temporal structure** and **spatial context** of representational reconfiguration jointly determine listing survival in a platform service market context.
 
 Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationalizes three temporally distinct constructs — *representational fit*, *variability*, and *momentum* — and tests their survival consequences on a **seventeen-quarter panel of 401 Airbnb listings** across 18 Hong Kong administrative districts (2021Q1–2025Q2). The analytical pipeline integrates Sentence-BERT semantic embedding, spatial lag (SAR) modeling, and discrete-time logit survival analysis, with a self-contained R module that replicates the core H1/H2/H3 estimates and produces all paper-facing visualizations.
 
 **Key findings:**
 
-- A spatial lag (SAR) model achieves an **in-sample R² = 0.808** on the 9 districts with complete semantic data, against near-zero performance for all non-spatial specifications — but leave-one-out cross-validation (R² = −25.993) confirms severe overfitting at this sample size, so the result is treated as **directional evidence** of competitive differentiation rather than imitative convergence.
-- Representational fit is associated with shorter survival overall (β = −0.928, *p* = 0.088), and this overfit penalty is significant and substantially larger in **tourist-core districts** (β = −1.318, *p* = 0.049) than in non-tourist districts (β = +0.130, n.s.).
-- Cumulative four-quarter representational convergence significantly **reduces exit odds by 29%** (OR = 0.714, *p* < .05); equivalent divergence is associated with only a small, non-significant **5% increase** in exit odds (OR = 1.050, n.s.) — an asymmetry confirmed by a Wald test (χ²(1) = 4.31, *p* = .038) and consistent with **gain-sensitivity** rather than loss aversion.
+- A spatial lag (SAR) model achieves an **in-sample R² = 0.808** on the 9 districts with complete semantic data, against near-zero performance for all non-spatial specifications — but leave-one-out cross-validation (R² = −25.993) confirms severe overfitting at this sample size, so the result is treated as **directional evidence** that geographic structure shapes semantic coordination, pending replication with the complete N = 18 district dataset.
+- Representational fit (measured as cosine *distance*) is associated with shorter survival overall (β = −0.928, *p* = 0.088): a negative coefficient on cosine distance implies that listings with *higher* fit (smaller distance from the market centroid) exhibit shorter survival. This overfit penalty is significant and substantially larger in **high-demand heterogeneity districts** (β = −1.318, *p* = 0.049) than in stable, locally anchored service markets (β = +0.130, n.s.).
+- Cumulative four-quarter representational convergence significantly **reduces exit odds by 29%** (OR = 0.714, *p* < .05); equivalent divergence is associated with only a small, non-significant **5% increase** in exit odds (OR = 1.050, n.s.) — an asymmetry confirmed by a Wald test (χ²(1) = 4.31, *p* = .038) and consistent with **gain-sensitivity** rather than loss aversion. The ratio of absolute log-odds magnitudes (0.338 / 0.049 ≈ 6.9) quantifies the dominance of recovery over deterioration effects.
 - Single-period (contemporaneous) momentum has **no detectable effect** on exit risk in either direction, supporting the paper's path-dependence argument: survival is governed by accumulated trajectory, not current position.
 
 ---
@@ -32,7 +32,7 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 .
 ├── README.md
 ├── main_analysis.py                     # H1 (OLS lifetime) + H2 (discrete-time logit survival)
-├── extension_analysis.py                # H3 spatial subgroup extension (tourist vs. non-tourist)
+├── extension_analysis.py                # H3 spatial subgroup extension (high-heterogeneity vs. stable markets)
 │
 ├── data/
 │   ├── IV_panel.csv                     # Listing × quarter panel (preprocessed, 3,614 obs.) — Python pipeline input
@@ -45,8 +45,8 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 │   ├── results_H2_M4_positive_momentum.csv  # H2 Model M4: Positive momentum
 │   ├── results_H2_M5_negative_momentum.csv  # H2 Model M5: Negative momentum
 │   ├── results_H2_M6_joint.csv          # H2 Model M6: Joint momentum (both directions)
-│   ├── results_ExtA_tourist.csv         # H3 Ext-A: Tourist-core subgroup
-│   ├── results_ExtB_nontourist.csv      # H3 Ext-B: Non-tourist subgroup
+│   ├── results_ExtA_tourist.csv         # H3 Ext-A: High-heterogeneity district subgroup
+│   ├── results_ExtB_nontourist.csv      # H3 Ext-B: Stable market subgroup
 │   └── results_ExtC_interaction.csv     # H3 Ext-C: Full-sample interaction model
 │
 └── r_analysis/                          # Self-contained R replication & visualization module
@@ -78,7 +78,7 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 | **2. H1 OLS models** | Fits M1 (joint Fit + Variability + controls) with HC1 robust SE; reports H1a/H1b coefficients | Table 4 |
 | **3. H2 discrete-time logit** | Fits Model A (contemporaneous pos_step/neg_step) and Model B (4Q cumulative, z-scored momentum) with manually computed listing-clustered SE; runs the Wald test for recovery-vs-deterioration magnitude asymmetry | Table 5, Section 4.4 |
 | **4. Temporal evolution** | Aggregates mean semantic distance and exit rate by quarter across the full 2021Q1–2025Q2 panel | Figure 4 |
-| **5. H3 spatial subgroup** | Re-estimates the H1 specification separately for tourist-core (Yau Tsim Mong, Wan Chai, Central & Western) and non-tourist districts | Table 6 |
+| **5. H3 spatial subgroup** | Re-estimates the H1 specification separately for high-demand heterogeneity districts (Yau Tsim Mong, Wan Chai, Central & Western) and stable market districts | Table 6 |
 | **6. Supplementary figures** | District-level data coverage and quarterly exit-rate trend | — |
 
 ### Figures produced
@@ -89,8 +89,8 @@ Drawing on **dynamic capabilities theory** (Teece, 2007), the study operationali
 | `fig2_model_AB_comparison.png` | Model A (contemporaneous) vs. Model B (4Q cumulative) β and OR comparison — the path-dependence test |
 | `fig3_beta_magnitude.png` | Recovery vs. deterioration β magnitude comparison with the Wald asymmetry statistic annotated |
 | `fig4_temporal_evolution.png` | Market-level mean semantic distance, 2021Q1–2025Q2 |
-| `fig5_spatial_subgroup.png` | H3 tourist-core vs. non-tourist vs. full-sample coefficient comparison (fit and variability) |
-| `fig6_district_coverage.png` | Listing-quarter observation counts by administrative district, tourist-core highlighted |
+| `fig5_spatial_subgroup.png` | H3 high-heterogeneity vs. stable-market vs. full-sample coefficient comparison (fit and variability) |
+| `fig6_district_coverage.png` | Listing-quarter observation counts by administrative district, high-heterogeneity districts highlighted |
 | `fig7_exit_rate_time.png` | Quarterly exit rate over the panel period |
 | `fig8_odds_ratio_summary.png` | Odds ratios for recovery/deterioration under Model A vs. Model B |
 
@@ -127,14 +127,14 @@ setwd("r_analysis")
 source("analysis_main.R")
 ```
 
-Console output reports, in order: sample sizes for the H1 and H2 estimation samples, the M1 R² and H1a/H1b coefficients, the Model B odds ratios for positive and negative 4Q momentum, the Wald asymmetry test result, the tourist-core/non-tourist subgroup coefficients, and a manifest of every PNG written to `figures/`.
+Console output reports, in order: sample sizes for the H1 and H2 estimation samples, the M1 R² and H1a/H1b coefficients, the Model B odds ratios for positive and negative 4Q momentum, the Wald asymmetry test result, the high-heterogeneity/stable-market subgroup coefficients, and a manifest of every PNG written to `figures/`.
 
 ### Key design choices
 
 - **Manual cluster-robust SE**: standard errors for the H2 discrete-time logit Model B are clustered at `listing_id` via a hand-written sandwich-estimator function (`cluster_vcov()`), rather than an external package, reproducing the listing-clustered SE reported in Table 5 of the paper.
 - **Standardized momentum**: `positive_momentum_4q` and `negative_momentum_4q` are z-scored within the estimation sample before entering Model B, per Section 3.3.2 of the paper, so that the Wald test compares directly comparable magnitudes.
 - **Exact sample reconstruction**: the H2 panel is rebuilt using the same sequential filters as the paper — drop first-quarter spells (`new_spell == 0`) → drop rows with missing 4Q momentum → drop the terminal quarter → drop zero-event quarters → drop rows with missing lagged controls.
-- **90%/95% dual-CI forest plot**: Figure 1 displays both confidence levels and codes significance at the 90% threshold, matching the paper's convention of reporting marginal significance (e.g., β = −0.928†, *p* = 0.088) for the H1a fit effect.
+- **90%/95% dual-CI forest plot**: Figure 1 displays both confidence levels and codes significance at the 90% threshold, matching the paper's convention of reporting marginal significance (e.g., β = −0.928†, *p* = 0.088) for the H1a fit effect. Note that fit_init is operationalized as cosine distance, so a negative β indicates that higher representational fit (smaller distance) is associated with shorter survival.
 
 ---
 
@@ -153,7 +153,7 @@ The file `IV_panel.csv` contains the integrated listing × quarter panel after a
 | `listing_id` | int | Unique listing identifier |
 | `period_qtr` | str | Fiscal quarter (e.g., `2021Q1`) |
 | `neighbourhood_cleansed` | str | Hong Kong administrative district (18 districts) |
-| `sem_distance` | float | Cosine distance between listing embedding and district-quarter centroid (Semantic Discrepancy Index, SDI) |
+| `sem_distance` | float | Cosine distance between listing embedding and district-quarter centroid (Semantic Discrepancy Index, SDI); lower values indicate higher representational fit |
 | `sem_std` | float | Within-quarter standard deviation of review-level cosine distances (representational variability proxy) |
 | `delta_sem_distance` | float | Quarter-on-quarter change in SDI (Δsem_distance) |
 | `n_reviews_qtr` | int | Number of guest reviews in the quarter |
@@ -180,15 +180,15 @@ Listing descriptions and aggregated quarterly review corpora are encoded using *
 SDI(i,t) = 1 − cos(s_i, r_{i,t})
 ```
 
-where `s_i` is the listing embedding and `r_{i,t}` is the district-quarter demand centroid. Values range from 0 (perfect alignment) to 2 (complete opposition).
+where `s_i` is the listing embedding and `r_{i,t}` is the district-quarter demand centroid. Values range from 0 (perfect alignment) to 2 (complete opposition). Lower SDI values indicate higher representational fit.
 
 ### Representational Momentum
 
 Quarter-on-quarter changes in SDI are decomposed into directionally signed components:
 
 ```
-pos_step(i,t) = max(−ΔSDI(i,t), 0)   # convergence toward centroid
-neg_step(i,t) = max(+ΔSDI(i,t), 0)   # divergence from centroid
+pos_step(i,t) = max(−ΔSDI(i,t), 0)   # convergence toward centroid (increasing fit)
+neg_step(i,t) = max(+ΔSDI(i,t), 0)   # divergence from centroid (decreasing fit)
 ```
 
 Four-quarter rolling sums (`positive_momentum_4q`, `negative_momentum_4q`) aggregate directional tendency across a multi-period window, capturing the purposive trajectory central to the dynamic capabilities account of reconfiguration.
@@ -202,7 +202,7 @@ Four-quarter rolling sums (`positive_momentum_4q`, `negative_momentum_4q`) aggre
 | H3a, H3b | OLS subgroup (Ext-A/B/C) | Same as H1 ± Interaction terms | HC1 heteroscedasticity-robust |
 | Spatial diagnostic | Spatial Lag / SAR | Drift Stability ~ ρ·W·y + X·β + ε | Maximum likelihood |
 
-Spatial autocorrelation is assessed via Global Moran's I on OLS residuals. District-level spatial dependence is modeled using a K-nearest neighbors (K = 5) weight matrix over Hong Kong's 18 administrative district centroids.
+Spatial autocorrelation is assessed via Global Moran's I on OLS residuals. District-level spatial dependence is modeled using a K-nearest neighbors (K = 5) weight matrix over Hong Kong's 18 administrative district centroids. The estimated spatial autocorrelation coefficient (ρ̂ = −0.690, p = 0.780) does not reach statistical significance; its sign is treated as descriptive only, pending replication with the complete N = 18 district dataset.
 
 ---
 
@@ -300,7 +300,7 @@ Rscript analysis_main.R
 | M2: Fit only | −0.931† | — | 317 | 0.239 | 0.193 |
 | M3: Variability only | — | −0.888 (n.s.) | 317 | 0.234 | 0.188 |
 
-†*p* < 0.10. HC1 robust SE. Entry-quarter fixed effects included.
+†*p* < 0.10. HC1 robust SE. Entry-quarter fixed effects included. Fit is operationalized as cosine distance; a negative coefficient indicates that higher fit (smaller distance from the market centroid) is associated with shorter survival.
 
 ### H2: Representational Momentum and Exit Risk
 
@@ -311,16 +311,16 @@ Rscript analysis_main.R
 | Model B (4Q cumulative, H2a) | Cumulative recovery | −0.338 | **0.714** | < .05 |
 | Model B (4Q cumulative, H2b) | Cumulative deterioration | +0.049 | 1.050 | n.s. |
 
-Listing-clustered SE. Quarter fixed effects included. N = 1,798 listing-quarters; per-quarter exit rate = 6.7%. Wald asymmetry test: χ²(1) = 4.31, *p* = .038 (recovery dominates).
+Listing-clustered SE. Quarter fixed effects included. N = 1,798 listing-quarters; per-quarter exit rate = 6.7%. Wald asymmetry test: χ²(1) = 4.31, *p* = .038 (recovery dominates; |β| ratio ≈ 6.9, consistent with gain-sensitivity rather than loss aversion).
 
 ### H3: Spatial Subgroup Extension
 
-| Construct | Tourist-Core (Ext-A) | Non-Tourist (Ext-B) | Direction |
+| Construct | High-Heterogeneity Districts (Ext-A) | Stable Markets (Ext-B) | Direction |
 |---|---|---|---|
 | Representational fit | −1.318* | +0.130 (n.s.) | ★ Reversed |
 | Representational variability | +1.725 (n.s.) | −4.474† | ★ Reversed |
 
-\**p* < 0.05, †*p* < 0.10. Tourist-core = Yau Tsim Mong, Wan Chai, Central & Western (n = 188). Non-tourist = remaining 15 districts (n = 129).
+\**p* < 0.05, †*p* < 0.10. High-heterogeneity districts = Yau Tsim Mong, Wan Chai, Central & Western (n = 188). Stable markets = remaining 15 districts (n = 129).
 
 > **Note:** All results are based on a simulated embedding pipeline rather than actual Airbnb listing text, and should be treated as directional and exploratory rather than empirically definitive.
 
